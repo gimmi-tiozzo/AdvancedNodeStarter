@@ -8,9 +8,10 @@ const userFactory = require("../factories/userFactory");
 class CustomPage {
   /**
    * costruisci un nuovo proxy verso le classi Page, CustomPage e Browser
+   * @param headless indica se lanciare il browser in modalità headeless (senza UI)
    */
-  static async build() {
-    const browser = await puppeteer.launch({ headless: false });
+  static async build(headless = true) {
+    const browser = await puppeteer.launch({ headless });
     const page = await browser.newPage();
     const customPage = new CustomPage(page);
 
@@ -41,7 +42,7 @@ class CustomPage {
     await this.page.setCookie({ name: "session.sig", value: sig });
 
     //refresh. Con i cookie impostati si risulta autenticati e l'header della pagina cambia con il link logout
-    await this.page.goto("http://localhost:3000");
+    await this.page.goto("http://localhost:3000/blogs");
     await this.page.waitFor("a[href='/auth/logout']"); //attendi caricamento dell'elemento nel DOM della pagina
   }
 

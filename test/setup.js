@@ -1,3 +1,5 @@
+jest.setTimeout(30000); //imposta per l'esecuzione di un test un timeout di 30 s
+
 require("../models/User");
 
 const mongoose = require("mongoose");
