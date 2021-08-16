@@ -1,23 +1,20 @@
-const puppeteer = require("puppeteer");
-const sessionFactory = require("./factories/sessionFactory");
-const userFactory = require("./factories/userFactory");
+const Page = require("./helpers/page");
 
-let browser, page;
+let page;
 
 //setup per ogni unit test
 beforeEach(async () => {
-  browser = await puppeteer.launch({ headless: false });
-  page = await browser.newPage();
+  page = await Page.build();
   await page.goto("http://localhost:3000");
 });
 
 //teardown per ogni unit test
 afterEach(async () => {
-  await browser.close();
+  await page.close();
 });
 
 test("Verifica contenuto header blog", async () => {
-  const text = await page.$eval("a.brand-logo", (el) => el.innerHTML);
+  const text = await page.getContentFor("a.brand-logo");
   expect(text).toEqual("Blogster");
 });
 
@@ -29,17 +26,9 @@ test("Verifica inizio processo OAuth2", async () => {
 
 //con test.only solo questo test viene eseguito nella suite corrente, gli altri vengono ignorati
 test("Visualizza tasto logout quando sono autenticato", async () => {
-  //imposta i coockie di sessione OAuth2
-  const user = await userFactory();
-  const { session, sig } = sessionFactory(user);
-  await page.setCookie({ name: "session", value: session });
-  await page.setCookie({ name: "session.sig", value: sig });
-
-  //refresh. Con i cookie impostati si risulta autenticati e l'header della pagina cambia con il link logout
-  await page.goto("http://localhost:3000");
-  await page.waitFor("a[href='/auth/logout']"); //attendi caricamento dell'elemento nel DOM della pagina
+  await page.login();
 
   //estrai il valore del link logout
-  const text = await page.$eval("a[href='/auth/logout']", (el) => el.innerHTML);
+  const text = await page.getContentFor("a[href='/auth/logout']");
   expect(text).toEqual("Logout");
 });
