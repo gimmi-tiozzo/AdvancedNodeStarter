@@ -11,7 +11,10 @@ class CustomPage {
    * @param headless indica se lanciare il browser in modalità headeless (senza UI)
    */
   static async build(headless = true) {
-    const browser = await puppeteer.launch({ headless });
+    const browser = await puppeteer.launch({
+      headless,
+      args: ["--no-sandbox"],
+    });
     const page = await browser.newPage();
     const customPage = new CustomPage(page);
 
