@@ -54,6 +54,58 @@ class CustomPage {
   getContentFor(selector) {
     return this.page.$eval(selector, (el) => el.innerHTML);
   }
+
+  /**
+   * Esegui una chiamata get
+   * @param {*} path url
+   * @returns response
+   */
+  get(path) {
+    return this.page.evaluate(async (_path) => {
+      const res = await fetch(_path, {
+        method: "GET",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return await res.json();
+    }, path);
+  }
+
+  /**
+   * Esegui una chiamata post
+   * @param {*} path url
+   * @param {*} data json
+   * @returns response
+   */
+  post(path, data) {
+    return this.page.evaluate(
+      (_path, _data) => {
+        return fetch(_path, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(_data),
+        }).then((res) => res.json());
+      },
+      path,
+      data
+    );
+  }
+
+  /**
+   * Esegui delle azioni http (chiamate a api)
+   * @param {*} actions azione http da eseguire
+   * @returns Promise che raccoglie lo stato di resolve di tutte le azioni eseguite
+   */
+  execRequests(actions) {
+    return Promise.all(
+      actions.map(({ method, path, data }) => this[method](path, data))
+    );
+  }
 }
 
 module.exports = CustomPage;

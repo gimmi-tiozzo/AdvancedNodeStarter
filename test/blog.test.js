@@ -3,7 +3,7 @@ let page;
 
 //setup per ogni unit test
 beforeEach(async () => {
-  page = await Page.build();
+  page = await Page.build(true);
   await page.goto("http://localhost:3000");
 });
 
@@ -59,39 +59,5 @@ describe("Se autenticato", () => {
       expect(titleError).toEqual("You must provide a value");
       expect(contentError).toEqual("You must provide a value");
     });
-  });
-});
-
-describe("Se non autenticato", async () => {
-  test("Utente non può creare un nuovo post per un blog", async () => {
-    const result = await page.evaluate(() => {
-      return fetch("api/blogs", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title: "My Title", content: "My Content" }),
-      }).then((res) => res.json());
-    });
-
-    expect(result).not.toBeNull();
-    expect(result.error).toEqual("You must log in!");
-  });
-
-  test("Utente non può accedere alla pagina dei blogs", async () => {
-    const result = await page.evaluate(async () => {
-      const res = await fetch("api/blogs", {
-        method: "GET",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return await res.json();
-    });
-
-    expect(result).not.toBeNull();
-    expect(result.error).toEqual("You must log in!");
   });
 });

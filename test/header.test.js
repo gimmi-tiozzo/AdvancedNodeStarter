@@ -4,7 +4,7 @@ let page;
 
 //setup per ogni unit test
 beforeEach(async () => {
-  page = await Page.build();
+  page = await Page.build(true);
   await page.goto("http://localhost:3000");
 });
 
